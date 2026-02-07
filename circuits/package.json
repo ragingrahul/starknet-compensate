@@ -1,0 +1,18 @@
+{
+  "name": "compensate-circuits",
+  "version": "1.0.0",
+  "description": "Circom circuit for the CompanyPayroll ZK shielded payroll system",
+  "private": true,
+  "scripts": {
+    "compile": "circom shielded_payroll.circom --r1cs --wasm --sym -o build/",
+    "setup:phase1": "snarkjs powersoftau new bn128 20 pot20_0000.ptau -v && snarkjs powersoftau contribute pot20_0000.ptau pot20_0001.ptau --name='Compensate phase1' -e='random entropy' && snarkjs powersoftau prepare phase2 pot20_0001.ptau pot20_final.ptau -v",
+    "setup:phase2": "snarkjs groth16 setup build/shielded_payroll.r1cs pot20_final.ptau circuit_0000.zkey && snarkjs zkey contribute circuit_0000.zkey circuit_final.zkey --name='Compensate phase2' -e='random entropy 2' && snarkjs zkey export verificationkey circuit_final.zkey verification_key.json",
+    "generate:verifier": "garaga gen --system groth16 --vk verification_key.json --output ../compensate/src/shielded_groth16_verifier.cairo",
+    "build": "npm run compile && npm run setup:phase2"
+  },
+  "dependencies": {
+    "circomlib": "^2.0.5",
+    "circomlibjs": "^0.1.7",
+    "snarkjs": "^0.7.4"
+  }
+}
