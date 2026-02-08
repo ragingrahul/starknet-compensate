@@ -1,0 +1,29 @@
+[package]
+name = "compensate"
+version = "0.1.0"
+edition = "2024_07"
+
+[dependencies]
+garaga = { git = "https://github.com/keep-starknet-strange/garaga.git", tag = "v1.0.1" }
+starknet = "2.14.0"
+
+[dev-dependencies]
+snforge_std = "0.53.0"
+assert_macros = "2.14.0"
+
+[lib]
+
+[[target.starknet-contract]]
+sierra = true
+casm = true
+casm-add-pythonic-hints = true
+
+[scripts]
+test = "snforge test"
+
+[tool.scarb]
+allow-prebuilt-plugins = ["snforge_std"]
+
+[cairo]
+sierra-replace-ids = false
+inlining-strategy = 2
