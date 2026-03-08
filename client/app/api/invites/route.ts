@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     const supabase = createServiceClient();
     const { data: employee } = await supabase
       .from("employees")
-      .select("id")
+      .select("id, name, email")
       .eq("id", result.data.employeeId)
       .eq("company_id", company.id)
       .single();
@@ -67,7 +67,30 @@ export async function POST(req: NextRequest) {
         { status: 500 },
       );
     }
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+    const fullInviteUrl = `${appUrl}/onboard/${result.data.inviteToken}`;
+    console.log(fullInviteUrl);
+    console.log(employee.email);
+    console.log(company.name);
+    console.log(employee.name);
+    if (employee.email) {
+      const { Resend } = await import("resend");
+      const resend = new Resend(process.env.RESEND_API_KEY);
 
+      await resend.emails.send({
+        from: "Compensate <onboarding@yourdomain.com>",
+        to: employee.email,
+        subject: `You've been added to ${company.name}'s payroll on Compensate`,
+        html: `
+          <p>Hi ${employee.name},</p>
+          <p><strong>${company.name}</strong> has added you to their payroll system.</p>
+          <p>Click the link below to set up your account and start claiming your salary:</p>
+          <p><a href="${fullInviteUrl}">${fullInviteUrl}</a></p>
+          <p>This link expires in 48 hours.</p>
+          <p>— The Compensate Team</p>
+        `,
+      });
+    }
     return NextResponse.json(
       {
         invite: data,
