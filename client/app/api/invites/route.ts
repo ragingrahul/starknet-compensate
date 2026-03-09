@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
       const resend = new Resend(process.env.RESEND_API_KEY);
 
       await resend.emails.send({
-        from: "Compensate <onboarding@yourdomain.com>",
+        from: "Compensate <onboarding@swapthesurge.com>",
         to: employee.email,
         subject: `You've been added to ${company.name}'s payroll on Compensate`,
         html: `
